@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jakiego odpoczynku potrzebujesz? | Quiz ADHD</title>
+  <title>Jakiego odpoczynku potrzebujesz?</title>
   <meta name="description" content="14 krótkich pytań o to, jak czujesz się dziś. Dowiedz się jakiego odpoczynku potrzebujesz teraz i co konkretnie możesz zrobić.">
   <meta property="og:title" content="Jakiego odpoczynku potrzebujesz?">
   <meta property="og:description" content="14 pytań → konkretny typ odpoczynku dopasowany do Twojego stanu. Bez rejestracji, dane zostają w przeglądarce.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mrcanon19.github.io/adhd-rest-quiz/">
+  <meta property="og:locale" content="pl_PL">
   <meta name="theme-color" content="#2a9d8f">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -86,9 +88,7 @@
       text-decoration: none;
       font-weight: 600;
     }
-    .made-by a:hover {
-      text-decoration: underline;
-    }
+    .made-by a:hover { text-decoration: underline; }
 
     /* Question */
     .q-label {
@@ -125,8 +125,10 @@
       user-select: none;
     }
     .answer-btn:hover { border-color: #2a9d8f; background: #f0f9f8; }
-    .answer-btn:active { background: #d0f0ee; border-color: #2a9d8f; transform: scale(0.98); }
+    .answer-btn:active { background: #d0f0ee; border-color: #2a9d8f; }
+    .answer-btn:focus-visible { outline: 3px solid #2a9d8f; outline-offset: 2px; }
     .answer-btn.selected { border-color: #2a9d8f; background: #e0f5f3; }
+    .answer-btn:disabled { opacity: 0.6; cursor: default; }
     .answers-row { flex-direction: row; }
     .answers-row .answer-btn { flex: 1; text-align: center; }
 
@@ -141,10 +143,11 @@
       font-size: 17px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.15s, transform 0.1s;
     }
     .btn-primary:hover { background: #238b7e; }
     .btn-primary:active { background: #1e7a6e; transform: scale(0.98); }
+    .btn-primary:focus-visible { outline: 3px solid #1a3a3a; outline-offset: 2px; }
     .btn-secondary {
       width: 100%;
       padding: 14px;
@@ -159,6 +162,8 @@
       transition: background 0.15s;
     }
     .btn-secondary:hover { background: #f0f9f8; }
+    .btn-secondary:active { background: #e0f5f3; }
+    .btn-secondary:focus-visible { outline: 3px solid #2a9d8f; outline-offset: 2px; }
 
     /* Results */
     .results-title { font-size: 23px; font-weight: 700; color: #1a3a3a; margin-bottom: 8px; }
@@ -219,15 +224,23 @@
       pointer-events: none;
       z-index: 999;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
   </style>
 </head>
 <body>
 
-<canvas id="confetti-canvas"></canvas>
+<canvas id="confetti-canvas" aria-hidden="true"></canvas>
 
 <div class="card">
 
-  <div class="progress-bar" id="progress-bar">
+  <div class="progress-bar" id="progress-bar"
+       role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Postęp quizu">
     <div class="progress-fill" id="progress-fill" style="width:0%"></div>
   </div>
 
@@ -236,13 +249,13 @@
     <div class="emoji-big">🧠</div>
     <h1>Jakiego odpoczynku potrzebujesz?</h1>
     <p class="subtitle">14 krótkich pytań o to, jak czujesz się dziś. Na końcu dowiesz się, jakiego odpoczynku potrzebujesz teraz — i co konkretnie możesz zrobić.</p>
-    <button class="btn-primary" onclick="startQuiz()">Zaczynamy →</button>
+    <button type="button" class="btn-primary" onclick="startQuiz()">Zaczynamy →</button>
     <p class="privacy-note">🔒 Dane zostają tylko w Twojej przeglądarce.</p>
     <p class="made-by">Stworzone przez <a href="https://www.linkedin.com/in/michalmarini/" target="_blank" rel="noopener noreferrer">Michał Marini</a></p>
   </div>
 
   <!-- PYTANIE -->
-  <div class="screen" id="screen-question">
+  <div class="screen" id="screen-question" aria-live="polite">
     <div class="q-label" id="q-label"></div>
     <div class="q-text" id="q-text"></div>
     <div class="answers" id="q-answers"></div>
@@ -253,16 +266,16 @@
     <div class="q-label">Ostatnie pytanie</div>
     <div class="q-text">Kiedy próbujesz odpoczywać, odpala się poczucie winy?</div>
     <div class="answers answers-row" id="guilt-answers">
-      <button class="answer-btn" onclick="selectGuilt(true, this)">Tak</button>
-      <button class="answer-btn" onclick="selectGuilt(false, this)">Nie</button>
+      <button type="button" class="answer-btn" onclick="selectGuilt(true, this)">Tak</button>
+      <button type="button" class="answer-btn" onclick="selectGuilt(false, this)">Nie</button>
     </div>
   </div>
 
   <!-- WYNIKI -->
-  <div class="screen" id="screen-results">
+  <div class="screen" id="screen-results" aria-live="polite">
     <div id="results-content"></div>
-    <button class="btn-primary" id="btn-share" onclick="shareResult()" style="margin-top:24px">Podziel się wynikiem</button>
-    <button class="btn-secondary" onclick="restartQuiz()">↩ Zacznij od nowa</button>
+    <button type="button" class="btn-primary" id="btn-share" onclick="shareResult()" style="margin-top:24px">Podziel się wynikiem</button>
+    <button type="button" class="btn-secondary" onclick="restartQuiz()">↩ Zacznij od nowa</button>
   </div>
 
 </div>
@@ -353,7 +366,7 @@
         'Kontakt z naturą',
         'Kontakt ze sztuką',
         'Rozmowy o sensie życia i wartościach',
-        'Bycie częścią czegoś większego niż Ty sam_',
+        'Bycie częścią czegoś większego niż Ty sam_a',
       ]
     },
     {
@@ -380,7 +393,7 @@
     { typeId: 'sensoryczny',   text: 'Teraz masz ochotę schować się do mysiej nory i odciąć od wszystkich bodźców?' },
     { typeId: 'emocjonalny',   text: 'Dziś czujesz się na skraju — masz krótki lont i łatwo Cię wyprowadzić z równowagi?' },
     { typeId: 'emocjonalny',   text: 'Teraz masz napięcie w ciele lub płaczliwość bez wyraźnego powodu?' },
-    { typeId: 'spoleczny',     text: 'Dziś czujesz się samotna_ nawet wśród ludzi — niewidziana_, niezrozumiana_?' },
+    { typeId: 'spoleczny',     text: 'Dziś czujesz się samotn_a nawet wśród ludzi — niewidzia_na, niezrozumia_na?' },
     { typeId: 'spoleczny',     text: 'Teraz ludzie Cię męczą i chcesz się wycofać, a jednocześnie brakuje Ci prawdziwego kontaktu?' },
     { typeId: 'egzystencjalny',text: 'Dziś masz poczucie pustki lub braku sensu — żyjesz, działasz, ale bez zakorzenienia?' },
     { typeId: 'egzystencjalny',text: 'Teraz łapiesz się na myśli "po co ja to w ogóle robię"?' },
@@ -399,10 +412,13 @@
   let currentQ = 0;
   let scores = {};
   let guiltSelected = null;
+  let isAnswering = false;
+  let confettiRafId = null;
 
   function initState() {
     currentQ = 0;
     guiltSelected = null;
+    isAnswering = false;
     scores = {};
     types.forEach(t => scores[t.id] = 0);
   }
@@ -411,7 +427,8 @@
 
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen-' + id).classList.add('active');
+    const target = document.getElementById('screen-' + id);
+    if (target) target.classList.add('active');
   }
 
   function startQuiz() {
@@ -422,8 +439,15 @@
   }
 
   function restartQuiz() {
+    if (confettiRafId) {
+      cancelAnimationFrame(confettiRafId);
+      confettiRafId = null;
+      const canvas = document.getElementById('confetti-canvas');
+      canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    }
     document.getElementById('progress-bar').style.display = 'none';
     document.getElementById('progress-fill').style.width = '0%';
+    document.getElementById('progress-bar').setAttribute('aria-valuenow', 0);
     showScreen('start');
   }
 
@@ -431,7 +455,9 @@
 
   function updateProgress(step) {
     const total = questions.length + 1;
-    document.getElementById('progress-fill').style.width = (step / total * 100) + '%';
+    const pct = Math.min(100, Math.round(step / total * 100));
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-bar').setAttribute('aria-valuenow', pct);
   }
 
   function renderQuestion() {
@@ -452,7 +478,13 @@
   }
 
   function selectAnswer(value, btn) {
-    document.querySelectorAll('#q-answers .answer-btn').forEach(b => b.classList.remove('selected'));
+    if (isAnswering) return;
+    isAnswering = true;
+
+    document.querySelectorAll('#q-answers .answer-btn').forEach(b => {
+      b.classList.remove('selected');
+      b.disabled = true;
+    });
     btn.classList.add('selected');
     scores[questions[currentQ].typeId] += value;
 
@@ -463,6 +495,7 @@
       } else {
         showGuilt();
       }
+      isAnswering = false;
     }, 280);
   }
 
@@ -470,16 +503,24 @@
 
   function showGuilt() {
     updateProgress(questions.length);
-    document.querySelectorAll('#guilt-answers .answer-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('#guilt-answers .answer-btn').forEach(b => {
+      b.classList.remove('selected');
+      b.disabled = false;
+    });
     showScreen('guilt');
   }
 
   function selectGuilt(val, btn) {
+    if (btn.disabled) return;
+    document.querySelectorAll('#guilt-answers .answer-btn').forEach(b => {
+      b.classList.remove('selected');
+      b.disabled = true;
+    });
     guiltSelected = val;
-    document.querySelectorAll('#guilt-answers .answer-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     setTimeout(() => {
       document.getElementById('progress-fill').style.width = '100%';
+      document.getElementById('progress-bar').setAttribute('aria-valuenow', 100);
       showResults();
     }, 280);
   }
@@ -540,7 +581,7 @@
 
   function shareResult() {
     const lines = lastTop3.map(t => `${t.emoji} ${t.name}`).join('\n');
-    const text = `Mój wynik z quizu odpoczynku:\n${lines}\n\nZrób swój → mrcanon19.github.io/adhd-rest-quiz`;
+    const text = `Mój wynik z quizu odpoczynku:\n${lines}\n\nZrób swój → https://mrcanon19.github.io/adhd-rest-quiz/`;
 
     const btn = document.getElementById('btn-share');
 
@@ -555,28 +596,40 @@
         setTimeout(() => { btn.textContent = 'Podziel się wynikiem'; }, 2000);
       });
     } else {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.cssText = 'position:fixed;opacity:0';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      btn.textContent = 'Skopiowano ✓';
-      setTimeout(() => { btn.textContent = 'Podziel się wynikiem'; }, 2000);
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = ok ? 'Skopiowano ✓' : 'Nie udało się skopiować';
+        setTimeout(() => { btn.textContent = 'Podziel się wynikiem'; }, 2000);
+      } catch (e) {
+        btn.textContent = 'Nie udało się skopiować';
+        setTimeout(() => { btn.textContent = 'Podziel się wynikiem'; }, 2000);
+      }
     }
   }
 
   // ── KONFETTI (zero dependencies) ─────────────────────────────
 
   function launchConfetti() {
+    if (confettiRafId) {
+      cancelAnimationFrame(confettiRafId);
+      confettiRafId = null;
+    }
+
     const canvas = document.getElementById('confetti-canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    const pieceCount = window.innerWidth < 768 ? 80 : 140;
     const colors = ['#2a9d8f', '#e9c46a', '#e76f51', '#264653', '#f4a261', '#a8dadc', '#457b9d', '#95d5b2'];
-    const pieces = Array.from({ length: 140 }, () => ({
+    const pieces = Array.from({ length: pieceCount }, () => ({
       x:        Math.random() * canvas.width,
       y:        Math.random() * canvas.height - canvas.height,
       w:        Math.random() * 11 + 6,
@@ -610,8 +663,12 @@
         ctx.restore();
       });
       frame++;
-      if (frame < maxFrames) requestAnimationFrame(draw);
-      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (frame < maxFrames) {
+        confettiRafId = requestAnimationFrame(draw);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confettiRafId = null;
+      }
     })();
   }
 </script>
