@@ -231,6 +231,7 @@
   <!-- WYNIKI -->
   <div class="screen" id="screen-results">
     <div id="results-content"></div>
+    <button class="btn-primary" id="btn-share" onclick="shareResult()">Podziel się wynikiem</button>
     <button class="btn-secondary" onclick="restartQuiz()">↩ Zacznij od nowa</button>
   </div>
 
@@ -454,11 +455,15 @@
 
   // ── WYNIKI ────────────────────────────────────────────────────
 
+  let lastTop3 = [];
+
   function showResults() {
     const sorted = types
       .map(t => ({ ...t, score: scores[t.id] }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
+
+    lastTop3 = sorted;
 
     const ranks      = ['Najbardziej potrzebny', 'Bardzo potrzebny', 'Warto zadbać'];
     const cardClass  = ['', 'second', 'third'];
@@ -498,6 +503,24 @@
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('results');
     launchConfetti();
+  }
+
+  // ── UDOSTĘPNIANIE ─────────────────────────────────────────────
+
+  function shareResult() {
+    const lines = lastTop3.map(t => `${t.emoji} ${t.name}`).join('\n');
+    const text = `Zrobiłam quiz i wyszło mi, że teraz potrzebuję:\n${lines}\n\nA Ty? → mrcanon19.github.io/adhd-rest-quiz`;
+
+    const btn = document.getElementById('btn-share');
+
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Skopiowano ✓';
+        setTimeout(() => { btn.textContent = 'Podziel się wynikiem'; }, 2000);
+      });
+    }
   }
 
   // ── KONFETTI (zero dependencies) ─────────────────────────────
