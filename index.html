@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jakiego odpoczynku potrzebujesz?</title>
+  <title>Jakiego odpoczynku potrzebujesz? | Quiz ADHD</title>
+  <meta name="description" content="14 krótkich pytań o to, jak czujesz się dziś. Dowiedz się jakiego odpoczynku potrzebujesz teraz i co konkretnie możesz zrobić.">
+  <meta property="og:title" content="Jakiego odpoczynku potrzebujesz?">
+  <meta property="og:description" content="14 pytań → konkretny typ odpoczynku dopasowany do Twojego stanu. Bez rejestracji, dane zostają w przeglądarce.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#2a9d8f">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -61,7 +66,7 @@
       color: #666;
       text-align: center;
       line-height: 1.6;
-      margin-bottom: 36px;
+      margin-bottom: 20px;
     }
     .privacy-note {
       font-size: 12px;
@@ -71,10 +76,10 @@
       line-height: 1.5;
     }
     .made-by {
-      font-size: 13px;
-      color: #555;
+      font-size: 12px;
+      color: #aaa;
       text-align: center;
-      margin-top: 12px;
+      margin-top: 10px;
     }
     .made-by a {
       color: #e76f51;
@@ -120,6 +125,7 @@
       user-select: none;
     }
     .answer-btn:hover { border-color: #2a9d8f; background: #f0f9f8; }
+    .answer-btn:active { background: #d0f0ee; border-color: #2a9d8f; transform: scale(0.98); }
     .answer-btn.selected { border-color: #2a9d8f; background: #e0f5f3; }
     .answers-row { flex-direction: row; }
     .answers-row .answer-btn { flex: 1; text-align: center; }
@@ -138,6 +144,7 @@
       transition: background 0.15s;
     }
     .btn-primary:hover { background: #238b7e; }
+    .btn-primary:active { background: #1e7a6e; transform: scale(0.98); }
     .btn-secondary {
       width: 100%;
       padding: 14px;
@@ -230,8 +237,8 @@
     <h1>Jakiego odpoczynku potrzebujesz?</h1>
     <p class="subtitle">14 krótkich pytań o to, jak czujesz się dziś. Na końcu dowiesz się, jakiego odpoczynku potrzebujesz teraz — i co konkretnie możesz zrobić.</p>
     <button class="btn-primary" onclick="startQuiz()">Zaczynamy →</button>
-    <p class="privacy-note">🔒 Twoje odpowiedzi nie są nigdzie zapisywane ani wysyłane. Wszystko zostaje w Twojej przeglądarce.</p>
-    <p class="made-by">Stworzone przez <a href="https://www.linkedin.com/in/michalmarini/" target="_blank">Michał Marini</a></p>
+    <p class="privacy-note">🔒 Dane zostają tylko w Twojej przeglądarce.</p>
+    <p class="made-by">Stworzone przez <a href="https://www.linkedin.com/in/michalmarini/" target="_blank" rel="noopener noreferrer">Michał Marini</a></p>
   </div>
 
   <!-- PYTANIE -->
@@ -287,7 +294,7 @@
       desc: 'Twój mózg potrzebuje przerwy od myślenia, decydowania i przetwarzania. Nie chodzi o nicnierobienie — chodzi o odcięcie się od wymagań głowy.',
       activities: [
         'Braindump — wywalenie myśli z głowy na papier',
-        'Bardzo proste zadania (odkurzanie, szorownie kibla)',
+        'Bardzo proste zadania (odkurzanie, szorowanie kibla)',
         'Coś rytmicznego — robótki ręczne, spacer BEZ podcastu',
         'Prowadzona medytacja',
         'Krótkie przerwy w ciągu dnia',
@@ -436,6 +443,7 @@
     el.innerHTML = '';
     options.forEach(opt => {
       const btn = document.createElement('button');
+      btn.type = 'button';
       btn.className = 'answer-btn';
       btn.textContent = opt.label;
       btn.onclick = () => selectAnswer(opt.value, btn);
@@ -538,11 +546,24 @@
 
     if (navigator.share) {
       navigator.share({ text }).catch(() => {});
-    } else {
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         btn.textContent = 'Skopiowano ✓';
         setTimeout(() => { btn.textContent = 'Podziel się wynikiem'; }, 2000);
+      }).catch(() => {
+        btn.textContent = 'Nie udało się skopiować';
+        setTimeout(() => { btn.textContent = 'Podziel się wynikiem'; }, 2000);
       });
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = 'Skopiowano ✓';
+      setTimeout(() => { btn.textContent = 'Podziel się wynikiem'; }, 2000);
     }
   }
 
