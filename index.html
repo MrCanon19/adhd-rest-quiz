@@ -12,9 +12,9 @@
       background: #f0f7f7;
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding: 16px;
+      padding: 24px 16px;
     }
 
     .card {
@@ -231,7 +231,7 @@
   <!-- WYNIKI -->
   <div class="screen" id="screen-results">
     <div id="results-content"></div>
-    <button class="btn-primary" id="btn-share" onclick="shareResult()">Podziel się wynikiem</button>
+    <button class="btn-primary" id="btn-share" onclick="shareResult()" style="margin-top:24px">Podziel się wynikiem</button>
     <button class="btn-secondary" onclick="restartQuiz()">↩ Zacznij od nowa</button>
   </div>
 
@@ -509,7 +509,7 @@
 
   function shareResult() {
     const lines = lastTop3.map(t => `${t.emoji} ${t.name}`).join('\n');
-    const text = `Zrobiłam quiz i wyszło mi, że teraz potrzebuję:\n${lines}\n\nA Ty? → mrcanon19.github.io/adhd-rest-quiz`;
+    const text = `Mój wynik z quizu odpoczynku:\n${lines}\n\nA Ty? → mrcanon19.github.io/adhd-rest-quiz`;
 
     const btn = document.getElementById('btn-share');
 
