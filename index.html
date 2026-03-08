@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jakiego odpoczynku potrzebujesz?</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f0f7f7;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 36px 28px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+    }
+
+    /* Progress */
+    .progress-bar {
+      height: 6px;
+      background: #e8f4f4;
+      border-radius: 3px;
+      margin-bottom: 36px;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #2a9d8f;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    /* Screens */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* Start */
+    .emoji-big { font-size: 52px; text-align: center; margin-bottom: 20px; }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a3a3a;
+      text-align: center;
+      line-height: 1.35;
+      margin-bottom: 14px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #666;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    /* Question */
+    .q-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #2a9d8f;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 14px;
+    }
+    .q-text {
+      font-size: 19px;
+      color: #1a3a3a;
+      line-height: 1.55;
+      font-weight: 500;
+      margin-bottom: 36px;
+      min-height: 80px;
+    }
+
+    /* Answers */
+    .answers { display: flex; flex-direction: column; gap: 12px; }
+    .answer-btn {
+      padding: 17px 20px;
+      border: 2px solid #e0eeee;
+      background: white;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #1a3a3a;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .answer-btn:hover { border-color: #2a9d8f; background: #f0f9f8; }
+    .answer-btn.selected { border-color: #2a9d8f; background: #e0f5f3; }
+    .answers-row { flex-direction: row; }
+    .answers-row .answer-btn { flex: 1; text-align: center; }
+
+    /* Buttons */
+    .btn-primary {
+      width: 100%;
+      padding: 17px;
+      background: #2a9d8f;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #238b7e; }
+    .btn-secondary {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      color: #2a9d8f;
+      border: 2px solid #2a9d8f;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background 0.15s;
+    }
+    .btn-secondary:hover { background: #f0f9f8; }
+
+    /* Results */
+    .results-title { font-size: 23px; font-weight: 700; color: #1a3a3a; margin-bottom: 8px; }
+    .results-sub { font-size: 15px; color: #666; line-height: 1.55; margin-bottom: 28px; }
+
+    .rest-card {
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 16px;
+      border-left: 5px solid #2a9d8f;
+      background: #f0f9f8;
+    }
+    .rest-card.second { border-left-color: #e9c46a; background: #fefbf0; }
+    .rest-card.third  { border-left-color: #e76f51; background: #fef6f3; }
+
+    .rest-rank { font-size: 11px; font-weight: 700; color: #2a9d8f; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 5px; }
+    .rest-card.second .rest-rank { color: #b89030; }
+    .rest-card.third  .rest-rank { color: #c05535; }
+
+    .rest-name { font-size: 18px; font-weight: 700; color: #1a3a3a; margin-bottom: 10px; }
+    .rest-desc { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 14px; }
+    .activities-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
+    .activities-list { list-style: none; }
+    .activities-list li {
+      font-size: 14px;
+      color: #333;
+      padding: 5px 0 5px 20px;
+      position: relative;
+      line-height: 1.45;
+    }
+    .activities-list li::before { content: "→"; position: absolute; left: 0; color: #2a9d8f; font-size: 12px; top: 6px; }
+
+    /* Guilt box */
+    .guilt-box {
+      background: #fff8f0;
+      border-radius: 16px;
+      padding: 22px;
+      margin-top: 16px;
+      border-left: 5px solid #f4a261;
+    }
+    .guilt-title { font-size: 16px; font-weight: 700; color: #1a3a3a; margin-bottom: 16px; }
+    .protocol-step {
+      font-size: 14px;
+      color: #444;
+      line-height: 1.6;
+      margin-bottom: 12px;
+      padding-left: 30px;
+      position: relative;
+    }
+    .protocol-step:last-child { margin-bottom: 0; }
+    .step-num { position: absolute; left: 0; font-weight: 700; color: #f4a261; }
+
+    /* Confetti */
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="card">
+
+  <div class="progress-bar" id="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+
+  <!-- START -->
+  <div class="screen active" id="screen-start">
+    <div class="emoji-big">🧠</div>
+    <h1>Jakiego odpoczynku potrzebujesz?</h1>
+    <p class="subtitle">14 krótkich pytań. Na końcu dowiesz się, których typów odpoczynku najbardziej Ci brakuje — i co konkretnie możesz zrobić.</p>
+    <button class="btn-primary" onclick="startQuiz()">Zaczynamy →</button>
+  </div>
+
+  <!-- PYTANIE -->
+  <div class="screen" id="screen-question">
+    <div class="q-label" id="q-label"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="answers" id="q-answers"></div>
+  </div>
+
+  <!-- POCZUCIE WINY -->
+  <div class="screen" id="screen-guilt">
+    <div class="q-label">Ostatnie pytanie</div>
+    <div class="q-text">Kiedy próbujesz odpoczywać, odpala się poczucie winy?</div>
+    <div class="answers answers-row" id="guilt-answers">
+      <button class="answer-btn" onclick="selectGuilt(true, this)">Tak</button>
+      <button class="answer-btn" onclick="selectGuilt(false, this)">Nie</button>
+    </div>
+  </div>
+
+  <!-- WYNIKI -->
+  <div class="screen" id="screen-results">
+    <div id="results-content"></div>
+    <button class="btn-secondary" onclick="restartQuiz()">↩ Zacznij od nowa</button>
+  </div>
+
+</div>
+
+<script>
+  // ── DANE ─────────────────────────────────────────────────────
+
+  const types = [
+    {
+      id: 'fizyczny',
+      name: 'Odpoczynek fizyczny',
+      emoji: '💤',
+      desc: 'Twoje ciało domaga się pauzy. Nie produktywności, nie aktywności — po prostu zatrzymania i pozwolenia mięśniom oraz układowi nerwowemu się zresetować.',
+      activities: [
+        'Sen i drzemki',
+        'Leżenie pod kocykiem',
+        'Leżenie przed TV',
+        'Delikatny stretching',
+        'Masaż lub ciepła kąpiel',
+        'Powolny spacer',
+        'Joga nidra',
+        'Czytanie lub gry wideo',
+      ]
+    },
+    {
+      id: 'poznawczy',
+      name: 'Odpoczynek poznawczy',
+      emoji: '🧩',
+      desc: 'Twój mózg potrzebuje przerwy od myślenia, decydowania i przetwarzania. Nie chodzi o nicnierobienie — chodzi o odcięcie się od wymagań głowy.',
+      activities: [
+        'Braindump — wywalenie myśli z głowy na papier',
+        'Bardzo proste zadania (odkurzanie, szorownie kibla)',
+        'Coś rytmicznego — robótki ręczne, spacer BEZ podcastu',
+        'Prowadzona medytacja',
+        'Krótkie przerwy w ciągu dnia',
+        'Dzień bez planów — mogę wszystko, ale nic nie muszę',
+        'Mind-wandering — myślenie o niebieskich migdałach',
+      ]
+    },
+    {
+      id: 'sensoryczny',
+      name: 'Odpoczynek sensoryczny',
+      emoji: '🔇',
+      desc: 'Twój układ nerwowy jest przebodźcowany. Za dużo dźwięków, świateł, ekranów, bodźców. Potrzebujesz ciszy i spokoju — dosłownie.',
+      activities: [
+        'Słuchawki z noise cancelling lub zatyczki do uszu',
+        'Przyciemnione światło lub kompletna ciemność',
+        'Zamknięte oczy i spokojna muzyka',
+        'Kołdra obciążeniowa lub mocny nacisk',
+        'Samotność i ograniczenie ekranów',
+      ]
+    },
+    {
+      id: 'emocjonalny',
+      name: 'Odpoczynek emocjonalny',
+      emoji: '💙',
+      desc: 'Nosisz w sobie emocje, które nie mają gdzie wyjść. Potrzebujesz przestrzeni do poczucia tego co czujesz — bez oceniania i bez maski.',
+      activities: [
+        'Płacz — jako uwolnienie, nie słabość',
+        'Rozmowa z kimś, kto nie ocenia',
+        'Journaling',
+        'Odcięcie się od źródła silnych emocji',
+        'Terapia, coaching lub grupa wsparcia',
+        'Koregulacja — bycie z spokojną osobą',
+        'Odstawienie social mediów',
+      ]
+    },
+    {
+      id: 'spoleczny',
+      name: 'Odpoczynek społeczny',
+      emoji: '🫂',
+      desc: 'Relacje Cię drenują zamiast ładować. Potrzebujesz albo prawdziwego kontaktu bez maski, albo świadomej samotności — zależy co Cię wykańcza.',
+      activities: [
+        'Ograniczenie relacji, które drenują',
+        'Bycie z kimś, przy kim nie trzeba się maskować',
+        'Body doubling — wspólne siedzenie i nicnierobienie',
+        'Kontakt bez wymagań i oczekiwań',
+        'Świadoma samotność',
+      ]
+    },
+    {
+      id: 'egzystencjalny',
+      name: 'Odpoczynek egzystencjalny',
+      emoji: '🌿',
+      desc: 'Brakuje Ci poczucia sensu i zakorzenienia. Działasz, funkcjonujesz — ale gdzieś w środku jest pustka. Potrzebujesz kontaktu z czymś większym niż lista zadań.',
+      activities: [
+        'Praktyki kontemplacyjne lub duchowe',
+        'Kontakt z naturą',
+        'Kontakt ze sztuką',
+        'Rozmowy o sensie życia i wartościach',
+        'Bycie częścią czegoś większego niż Ty sam_',
+      ]
+    },
+    {
+      id: 'kreatywny',
+      name: 'Odpoczynek kreatywny',
+      emoji: '✨',
+      desc: 'Twoja kreatywność wyschła. Mózg jedzie na autopilocie, nie ma iskry. Potrzebujesz piękna i tworzenia bez presji rezultatu.',
+      activities: [
+        'Kontakt ze sztuką — muzeum, koncert, film',
+        'Przebywanie w pięknej przestrzeni (natura, architektura, światło)',
+        'Tworzenie BEZ CELU — kolorowanki, bazgrolenie, malowanie po numerach',
+        'Zmiana otoczenia wizualnego',
+        'Patrzenie i słuchanie bez celu',
+      ]
+    }
+  ];
+
+  const questions = [
+    { typeId: 'fizyczny',      text: 'Czujesz ciężkość w ciele, bóle mięśni lub opadające powieki — jakbyś nie miał_a siły ruszyć się z miejsca?' },
+    { typeId: 'fizyczny',      text: 'Masz poczucie fizycznej niemocy — senność albo wrażenie, że ciało jest jak ołów?' },
+    { typeId: 'poznawczy',     text: 'Twój mózg miele w kółko te same myśli i nie możesz przestać myśleć?' },
+    { typeId: 'poznawczy',     text: 'Masz brain fog — gonitwa myśli, trudno Ci się skupić, nie możesz zebrać się w sobie?' },
+    { typeId: 'sensoryczny',   text: 'Wszystko jest za głośne, za jasne, za mocne — i wkurza Cię cały świat, nie wiesz nawet czemu?' },
+    { typeId: 'sensoryczny',   text: 'Masz ochotę schować się do mysiej nory i odciąć od wszystkich bodźców?' },
+    { typeId: 'emocjonalny',   text: 'Czujesz się na skraju — masz krótki lont i łatwo Cię wyprowadzić z równowagi?' },
+    { typeId: 'emocjonalny',   text: 'Masz napięcie w ciele lub płaczliwość bez wyraźnego powodu?' },
+    { typeId: 'spoleczny',     text: 'Czujesz się samotna_ nawet wśród ludzi — niewidziana_, niezrozumiana_?' },
+    { typeId: 'spoleczny',     text: 'Ludzie Cię męczą i chcesz się wycofać, a jednocześnie brakuje Ci prawdziwego kontaktu?' },
+    { typeId: 'egzystencjalny',text: 'Masz poczucie pustki lub braku sensu — żyjesz, działasz, ale bez zakorzenienia?' },
+    { typeId: 'egzystencjalny',text: 'Łapiesz się na myśli "po co ja to w ogóle robię"?' },
+    { typeId: 'kreatywny',     text: 'Brakuje Ci "iskry" — mózg jedzie na autopilocie, nie ma nowych pomysłów?' },
+    { typeId: 'kreatywny',     text: 'Czujesz zmęczenie ciągłym produkowaniem decyzji, treści lub rozwiązań?' },
+  ];
+
+  const options = [
+    { label: 'Rzadko',  value: 0 },
+    { label: 'Czasem',  value: 1 },
+    { label: 'Często',  value: 2 },
+  ];
+
+  // ── STAN ─────────────────────────────────────────────────────
+
+  let currentQ = 0;
+  let scores = {};
+  let guiltSelected = null;
+
+  function initState() {
+    currentQ = 0;
+    guiltSelected = null;
+    scores = {};
+    types.forEach(t => scores[t.id] = 0);
+  }
+
+  // ── NAWIGACJA ─────────────────────────────────────────────────
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+  }
+
+  function startQuiz() {
+    initState();
+    document.getElementById('progress-bar').style.display = 'block';
+    showScreen('question');
+    renderQuestion();
+  }
+
+  function restartQuiz() {
+    document.getElementById('progress-bar').style.display = 'none';
+    document.getElementById('progress-fill').style.width = '0%';
+    showScreen('start');
+  }
+
+  // ── PYTANIA ───────────────────────────────────────────────────
+
+  function updateProgress(step) {
+    const total = questions.length + 1;
+    document.getElementById('progress-fill').style.width = (step / total * 100) + '%';
+  }
+
+  function renderQuestion() {
+    updateProgress(currentQ);
+    document.getElementById('q-label').textContent = 'Pytanie ' + (currentQ + 1) + ' z ' + questions.length;
+    document.getElementById('q-text').textContent = questions[currentQ].text;
+
+    const el = document.getElementById('q-answers');
+    el.innerHTML = '';
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt.label;
+      btn.onclick = () => selectAnswer(opt.value, btn);
+      el.appendChild(btn);
+    });
+  }
+
+  function selectAnswer(value, btn) {
+    document.querySelectorAll('#q-answers .answer-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    scores[questions[currentQ].typeId] += value;
+
+    setTimeout(() => {
+      currentQ++;
+      if (currentQ < questions.length) {
+        renderQuestion();
+      } else {
+        showGuilt();
+      }
+    }, 280);
+  }
+
+  // ── POCZUCIE WINY ─────────────────────────────────────────────
+
+  function showGuilt() {
+    updateProgress(questions.length);
+    document.querySelectorAll('#guilt-answers .answer-btn').forEach(b => b.classList.remove('selected'));
+    showScreen('guilt');
+  }
+
+  function selectGuilt(val, btn) {
+    guiltSelected = val;
+    document.querySelectorAll('#guilt-answers .answer-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    setTimeout(() => {
+      document.getElementById('progress-fill').style.width = '100%';
+      showResults();
+    }, 280);
+  }
+
+  // ── WYNIKI ────────────────────────────────────────────────────
+
+  function showResults() {
+    const sorted = types
+      .map(t => ({ ...t, score: scores[t.id] }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+
+    const ranks      = ['Najbardziej potrzebny', 'Bardzo potrzebny', 'Warto zadbać'];
+    const cardClass  = ['', 'second', 'third'];
+
+    let html = `
+      <div class="results-title">Twój wynik 🎉</div>
+      <p class="results-sub">Oto typy odpoczynku, których najbardziej Ci teraz brakuje:</p>
+    `;
+
+    sorted.forEach((t, i) => {
+      html += `
+        <div class="rest-card ${cardClass[i]}">
+          <div class="rest-rank">${ranks[i]}</div>
+          <div class="rest-name">${t.emoji} ${t.name}</div>
+          <div class="rest-desc">${t.desc}</div>
+          <div class="activities-label">Co możesz zrobić</div>
+          <ul class="activities-list">
+            ${t.activities.map(a => `<li>${a}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+    });
+
+    if (guiltSelected) {
+      html += `
+        <div class="guilt-box">
+          <div class="guilt-title">⚠️ Odpala się poczucie winy gdy odpoczywasz</div>
+          <div class="protocol-step"><span class="step-num">1.</span> Zauważ tę myśl i nazwij ją: "To poczucie winy, nie fakt."</div>
+          <div class="protocol-step"><span class="step-num">2.</span> Sprawdź skąd się wzięła: "To stary schemat / przekonanie / reakcja ciała."</div>
+          <div class="protocol-step"><span class="step-num">3.</span> Wyreguluj układ nerwowy — oddech, nacisk, ruch.</div>
+          <div class="protocol-step"><span class="step-num">4.</span> Nie negocjuj z poczuciem winy. Mimo dyskomfortu — zostań przy odpoczynku.</div>
+        </div>
+      `;
+    }
+
+    document.getElementById('results-content').innerHTML = html;
+    document.getElementById('progress-bar').style.display = 'none';
+    showScreen('results');
+    launchConfetti();
+  }
+
+  // ── KONFETTI (zero dependencies) ─────────────────────────────
+
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#2a9d8f', '#e9c46a', '#e76f51', '#264653', '#f4a261', '#a8dadc', '#457b9d', '#95d5b2'];
+    const pieces = Array.from({ length: 140 }, () => ({
+      x:        Math.random() * canvas.width,
+      y:        Math.random() * canvas.height - canvas.height,
+      w:        Math.random() * 11 + 6,
+      h:        Math.random() * 6 + 4,
+      color:    colors[Math.floor(Math.random() * colors.length)],
+      rot:      Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 7,
+      speed:    Math.random() * 3.5 + 1.5,
+      drift:    (Math.random() - 0.5) * 1.5,
+      opacity:  1,
+    }));
+
+    let frame = 0;
+    const fadeStart = 140;
+    const maxFrames = 210;
+
+    (function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        p.y   += p.speed;
+        p.x   += p.drift;
+        p.rot += p.rotSpeed;
+        if (frame > fadeStart) p.opacity = Math.max(0, p.opacity - 0.025);
+
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      frame++;
+      if (frame < maxFrames) requestAnimationFrame(draw);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    })();
+  }
+</script>
+
+</body>
+</html>
