@@ -466,7 +466,7 @@
   }
 
   function renderQuestion() {
-    updateProgress(currentQ);
+    updateProgress(currentQ + 1);
     document.getElementById('q-label').textContent = 'Pytanie ' + (currentQ + 1) + ' z ' + questions.length;
     document.getElementById('q-text').textContent = questions[currentQ].text;
 
@@ -535,7 +535,8 @@
   let lastTop3 = [];
 
   function showResults() {
-    const sorted = types
+    const shuffled = [...types].sort(() => Math.random() - 0.5);
+    const sorted = shuffled
       .map(t => ({ ...t, score: scores[t.id] }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
