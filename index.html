@@ -604,7 +604,9 @@
 
   function shareResult() {
     const lines = lastTop3.map(t => `${t.emoji} ${t.name}`).join('\n');
-    const text = `Mój wynik z quizu odpoczynku:\n${lines}\n\nZrób swój → https://mrcanon19.github.io/adhd-rest-quiz/`;
+    const text = lastTop3.length
+      ? `Mój wynik z quizu odpoczynku:\n${lines}\n\nZrób swój → https://mrcanon19.github.io/adhd-rest-quiz/`
+      : `Zrobiłem_am quiz odpoczynku — dziś jestem w niezłej formie 💚\n\nSprawdź swój → https://mrcanon19.github.io/adhd-rest-quiz/`;
 
     const btn = document.getElementById('btn-share');
 
