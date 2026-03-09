@@ -542,27 +542,45 @@
 
     lastTop3 = sorted;
 
+    const topScore = sorted[0].score;
+
     const ranks      = ['Najbardziej potrzebny', 'Bardzo potrzebny', 'Warto zadbać'];
     const cardClass  = ['', 'second', 'third'];
 
-    let html = `
-      <div class="results-title">Twój wynik 🎉</div>
-      <p class="results-sub">Oto typy odpoczynku, których najbardziej Ci teraz brakuje:</p>
-    `;
+    let html;
 
-    sorted.forEach((t, i) => {
-      html += `
-        <div class="rest-card ${cardClass[i]}">
-          <div class="rest-rank">${ranks[i]}</div>
-          <div class="rest-name">${t.emoji} ${t.name}</div>
-          <div class="rest-desc">${t.desc}</div>
-          <div class="activities-label">Co możesz zrobić</div>
-          <ul class="activities-list">
-            ${t.activities.map(a => `<li>${a}</li>`).join('')}
-          </ul>
-        </div>
+    if (topScore === 0) {
+      html = `
+        <div class="results-title">Twój wynik ✨</div>
+        <p class="results-sub">Dziś nie widzę wyraźnego deficytu — Twój układ nerwowy jest w całkiem niezłej formie. To dobra wiadomość.</p>
+        <p class="results-sub">Wróć do quizu gdy poczujesz, że coś się zmienia — odpoczynek to nie nagroda za zmęczenie, ale regularna praktyka.</p>
       `;
-    });
+      lastTop3 = [];
+    } else {
+      const subtitle = topScore === 1
+        ? 'Sygnały są subtelne, ale warto je zauważyć. Oto co może Ci pomóc dziś:'
+        : 'Oto typy odpoczynku, których najbardziej Ci teraz brakuje:';
+
+      html = `
+        <div class="results-title">Twój wynik 🎉</div>
+        <p class="results-sub">${subtitle}</p>
+      `;
+
+      sorted.forEach((t, i) => {
+        if (t.score === 0) return;
+        html += `
+          <div class="rest-card ${cardClass[i]}">
+            <div class="rest-rank">${ranks[i]}</div>
+            <div class="rest-name">${t.emoji} ${t.name}</div>
+            <div class="rest-desc">${t.desc}</div>
+            <div class="activities-label">Co możesz zrobić</div>
+            <ul class="activities-list">
+              ${t.activities.map(a => `<li>${a}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      });
+    }
 
     if (guiltSelected) {
       html += `
