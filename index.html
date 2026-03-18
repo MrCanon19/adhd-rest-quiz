@@ -522,12 +522,12 @@
     setTimeout(() => {
       try {
         if (typeof Tally !== 'undefined' && Tally.openPopup) {
-          Tally.openPopup('A78jqk', { overlay: true });
+          Tally.openPopup('A78jqk', { overlay: true, hiddenFields: { score: score } });
         } else {
-          window.open('https://tally.so/r/A78jqk', '_blank');
+          window.open('https://tally.so/r/A78jqk?score=' + score, '_blank');
         }
       } catch(e) {
-        window.open('https://tally.so/r/A78jqk', '_blank');
+        window.open('https://tally.so/r/A78jqk?score=' + score, '_blank');
       }
     }, 600);
   }
