@@ -238,18 +238,18 @@
     }
     .nps-buttons {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       justify-content: center;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
     }
     .nps-btn {
-      width: 40px;
-      height: 40px;
+      width: clamp(28px, 8.5vw, 40px);
+      height: clamp(28px, 8.5vw, 40px);
       border-radius: 10px;
       border: 2px solid #d0ecea;
       background: white;
       color: #2a9d8f;
-      font-size: 14px;
+      font-size: clamp(12px, 3.5vw, 14px);
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s;
@@ -522,7 +522,13 @@
     setTimeout(() => {
       try {
         if (typeof Tally !== 'undefined' && Tally.openPopup) {
-          Tally.openPopup('A78jqk', { overlay: true, hiddenFields: { score: score } });
+          Tally.openPopup('A78jqk', {
+            overlay: true,
+            hiddenFields: { score: score },
+            onSubmit: () => {
+              document.getElementById('nps-thanks').textContent = 'Dziękujemy za feedback! 🙌';
+            }
+          });
         } else {
           window.open('https://tally.so/r/A78jqk?score=' + score, '_blank');
         }
