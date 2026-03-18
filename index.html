@@ -18,6 +18,7 @@
   <meta name="theme-color" content="#2a9d8f">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <script async src="https://tally.so/widgets/embed.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -522,32 +523,23 @@
   }
 
   function openTallyModal(score) {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
-    const iframe = document.createElement('iframe');
-    iframe.src = 'https://tally.so/embed/A78jqk?score=' + score + '&alignLeft=1&transparentBackground=0';
-    iframe.style.cssText = 'width:min(500px,95vw);height:min(480px,90vh);border:none;border-radius:16px;background:white;';
-    iframe.setAttribute('title', 'Formularz feedbacku');
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '✕';
-    closeBtn.style.cssText = 'position:absolute;top:12px;right:12px;background:white;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
-    closeBtn.setAttribute('aria-label', 'Zamknij');
-    const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'position:relative;';
-    wrapper.appendChild(closeBtn);
-    wrapper.appendChild(iframe);
-    overlay.appendChild(wrapper);
-    const close = () => document.body.removeChild(overlay);
-    closeBtn.addEventListener('click', close);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    const btn = document.createElement('button');
+    btn.setAttribute('data-tally-open', 'A78jqk');
+    btn.setAttribute('data-tally-overlay', '1');
+    btn.setAttribute('data-tally-hidden', 'score=' + score);
+    btn.style.display = 'none';
+    document.body.appendChild(btn);
+    if (typeof Tally !== 'undefined') {
+      Tally.loadEmbeds();
+    }
+    btn.click();
+    setTimeout(() => document.body.removeChild(btn), 500);
     window.addEventListener('message', function onMsg(e) {
       if (e.data && e.data.type === 'tally-form-submitted') {
         document.getElementById('nps-thanks').textContent = 'Dziękujemy za feedback! 🙌';
-        close();
         window.removeEventListener('message', onMsg);
       }
     });
-    document.body.appendChild(overlay);
   }
 
   function restartQuiz() {
