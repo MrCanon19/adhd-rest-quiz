@@ -520,8 +520,14 @@
     clickedBtn.classList.add('selected');
     document.getElementById('nps-thanks').textContent = 'Dzięki za ocenę! 🙏';
     setTimeout(() => {
-      if (typeof Tally !== 'undefined') {
-        Tally.openPopup('EH2t35WRH3cBh2srD00Dpw3NFQPJOul6', { overlay: true });
+      try {
+        if (typeof Tally !== 'undefined' && Tally.openPopup) {
+          Tally.openPopup('EH2t35WRH3cBh2srD00Dpw3NFQPJOul6', { overlay: true });
+        } else {
+          window.open('https://tally.so/r/EH2t35WRH3cBh2srD00Dpw3NFQPJOul6', '_blank');
+        }
+      } catch(e) {
+        window.open('https://tally.so/r/EH2t35WRH3cBh2srD00Dpw3NFQPJOul6', '_blank');
       }
     }, 600);
   }
