@@ -18,7 +18,7 @@
   <meta name="theme-color" content="#2a9d8f">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <script async src="https://tally.so/widgets/embed.js"></script>
+  <script src="https://tally.so/widgets/embed.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -523,23 +523,20 @@
   }
 
   function openTallyModal(score) {
-    const btn = document.createElement('button');
-    btn.setAttribute('data-tally-open', 'A78jqk');
-    btn.setAttribute('data-tally-overlay', '1');
-    btn.setAttribute('data-tally-hidden', 'score=' + score);
-    btn.style.display = 'none';
-    document.body.appendChild(btn);
+    const open = () => {
+      Tally.openPopup('A78jqk', {
+        overlay: true,
+        hiddenFields: { score: score },
+        onSubmit: () => {
+          document.getElementById('nps-thanks').textContent = 'Dziękujemy za feedback! 🙌';
+        }
+      });
+    };
     if (typeof Tally !== 'undefined') {
-      Tally.loadEmbeds();
+      open();
+    } else {
+      window.addEventListener('tally-loaded', open, { once: true });
     }
-    btn.click();
-    setTimeout(() => document.body.removeChild(btn), 500);
-    window.addEventListener('message', function onMsg(e) {
-      if (e.data && e.data.type === 'tally-form-submitted') {
-        document.getElementById('nps-thanks').textContent = 'Dziękujemy za feedback! 🙌';
-        window.removeEventListener('message', onMsg);
-      }
-    });
   }
 
   function restartQuiz() {
