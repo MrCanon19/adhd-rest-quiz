@@ -224,48 +224,6 @@
     .protocol-step:last-child { margin-bottom: 0; }
     .step-num { position: absolute; left: 0; font-weight: 700; color: #f4a261; }
 
-    /* NPS rating */
-    .nps-section {
-      margin-top: 28px;
-      padding-top: 24px;
-      border-top: 1px solid #e8f4f4;
-    }
-    .nps-label {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 14px;
-      text-align: center;
-    }
-    .nps-buttons {
-      display: flex;
-      gap: 5px;
-      justify-content: center;
-      flex-wrap: nowrap;
-    }
-    .nps-btn {
-      width: clamp(28px, 8.5vw, 40px);
-      height: clamp(28px, 8.5vw, 40px);
-      border-radius: 10px;
-      border: 2px solid #d0ecea;
-      background: white;
-      color: #2a9d8f;
-      font-size: clamp(12px, 3.5vw, 14px);
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-      flex-shrink: 0;
-    }
-    .nps-btn:hover { background: #f0f9f8; border-color: #2a9d8f; }
-    .nps-btn.selected { background: #2a9d8f; border-color: #2a9d8f; color: white; }
-    .nps-thanks {
-      text-align: center;
-      font-size: 14px;
-      color: #2a9d8f;
-      font-weight: 600;
-      margin-top: 12px;
-      min-height: 20px;
-    }
-
     /* Confetti */
     #confetti-canvas {
       position: fixed;
@@ -325,13 +283,9 @@
   <div class="screen" id="screen-results" aria-live="polite">
     <div id="results-content"></div>
     <button type="button" class="btn-primary" id="btn-share" onclick="shareResult()" style="margin-top:24px">Podziel się wynikiem</button>
+    <button type="button" class="btn-secondary" onclick="openTally()">Oceń quiz</button>
     <button type="button" class="btn-secondary" onclick="restartQuiz()">↩ Zacznij od nowa</button>
 
-    <div class="nps-section">
-      <div class="nps-label">Jak oceniasz ten quiz? (1–10)</div>
-      <div class="nps-buttons" id="nps-buttons"></div>
-      <div class="nps-thanks" id="nps-thanks"></div>
-    </div>
   </div>
 
 </div>
@@ -501,41 +455,11 @@
 
   // ── NPS ───────────────────────────────────────────────────────
 
-  function initNps() {
-    const container = document.getElementById('nps-buttons');
-    container.innerHTML = '';
-    document.getElementById('nps-thanks').textContent = '';
-    for (let i = 1; i <= 10; i++) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'nps-btn';
-      btn.textContent = i;
-      btn.addEventListener('click', () => selectNps(i, btn));
-      container.appendChild(btn);
-    }
-  }
-
-  function selectNps(score, clickedBtn) {
-    document.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
-    clickedBtn.classList.add('selected');
-    document.getElementById('nps-thanks').textContent = 'Dzięki za ocenę! 🙏';
-    setTimeout(() => openTallyModal(score), 600);
-  }
-
-  function openTallyModal(score) {
-    const open = () => {
-      Tally.openPopup('A78jqk', {
-        overlay: true,
-        hiddenFields: { score: score },
-        onSubmit: () => {
-          document.getElementById('nps-thanks').textContent = 'Dziękujemy za feedback! 🙌';
-        }
-      });
-    };
+  function openTally() {
     if (typeof Tally !== 'undefined') {
-      open();
+      Tally.openPopup('A78jqk', { overlay: true });
     } else {
-      window.addEventListener('tally-loaded', open, { once: true });
+      window.open('https://tally.so/r/A78jqk', '_blank');
     }
   }
 
@@ -694,7 +618,6 @@
     document.getElementById('results-content').innerHTML = html;
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('results');
-    initNps();
     launchConfetti();
   }
 
