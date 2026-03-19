@@ -26,7 +26,7 @@ Lub przez GitHub Pages (deploy automatyczny po push do własnego repo).
 ## Jak pushować
 
 ```bash
-cd /Users/michalmarini/Cursor-pliki/projects/adhd-rest-quiz
+cd /Users/michalmarini/marini-hub/projects/prywatne/adhd-rest-quiz
 git add index.html
 git commit -m "opis zmian"
 git push
