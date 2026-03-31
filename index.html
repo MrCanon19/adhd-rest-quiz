@@ -140,6 +140,20 @@
     .answers-row { flex-direction: row; }
     .answers-row .answer-btn { flex: 1; text-align: center; }
 
+    /* Back button */
+    .btn-back {
+      display: none;
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 14px 2px 0;
+      text-align: left;
+      transition: color 0.15s;
+    }
+    .btn-back:hover { color: #2a9d8f; }
+
     /* Buttons */
     .btn-primary {
       width: 100%;
@@ -267,6 +281,7 @@
     <div class="q-label" id="q-label"></div>
     <div class="q-text" id="q-text"></div>
     <div class="answers" id="q-answers"></div>
+    <button type="button" class="btn-back" id="btn-back-q" onclick="goBack()">← Wstecz</button>
   </div>
 
   <!-- POCZUCIE WINY -->
@@ -277,6 +292,7 @@
       <button type="button" class="answer-btn" onclick="selectGuilt(true, this)">Tak</button>
       <button type="button" class="answer-btn" onclick="selectGuilt(false, this)">Nie</button>
     </div>
+    <button type="button" class="btn-back" style="display:block" onclick="goBack()">← Wstecz</button>
   </div>
 
   <!-- WYNIKI -->
@@ -426,6 +442,7 @@
 
   let currentQ = 0;
   let scores = {};
+  let answers = [];
   let guiltSelected = null;
   let isAnswering = false;
   let confettiRafId = null;
@@ -434,6 +451,7 @@
     currentQ = 0;
     guiltSelected = null;
     isAnswering = false;
+    answers = [];
     scores = {};
     types.forEach(t => scores[t.id] = 0);
   }
@@ -490,6 +508,9 @@
     document.getElementById('q-label').textContent = 'Pytanie ' + (currentQ + 1) + ' z ' + questions.length;
     document.getElementById('q-text').textContent = questions[currentQ].text;
 
+    const backBtn = document.getElementById('btn-back-q');
+    backBtn.style.display = currentQ > 0 ? 'block' : 'none';
+
     const el = document.getElementById('q-answers');
     el.innerHTML = '';
     options.forEach(opt => {
@@ -511,6 +532,7 @@
       b.disabled = true;
     });
     btn.classList.add('selected');
+    answers.push({ typeId: questions[currentQ].typeId, value });
     scores[questions[currentQ].typeId] += value;
 
     setTimeout(() => {
@@ -522,6 +544,15 @@
       }
       isAnswering = false;
     }, 280);
+  }
+
+  function goBack() {
+    if (answers.length === 0 || isAnswering) return;
+    const last = answers.pop();
+    scores[last.typeId] -= last.value;
+    currentQ--;
+    showScreen('question');
+    renderQuestion();
   }
 
   // ── POCZUCIE WINY ─────────────────────────────────────────────
