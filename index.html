@@ -443,6 +443,7 @@
   let currentQ = 0;
   let scores = {};
   let answers = [];
+  let lastPoppedValue = null;
   let guiltSelected = null;
   let isAnswering = false;
   let confettiRafId = null;
@@ -452,6 +453,7 @@
     guiltSelected = null;
     isAnswering = false;
     answers = [];
+    lastPoppedValue = null;
     scores = {};
     types.forEach(t => scores[t.id] = 0);
   }
@@ -518,7 +520,8 @@
       btn.type = 'button';
       btn.className = 'answer-btn';
       btn.textContent = opt.label;
-      btn.onclick = () => selectAnswer(opt.value, btn);
+      if (lastPoppedValue !== null && opt.value === lastPoppedValue) btn.classList.add('selected');
+      btn.onclick = () => { lastPoppedValue = null; selectAnswer(opt.value, btn); };
       el.appendChild(btn);
     });
   }
@@ -550,6 +553,7 @@
     if (answers.length === 0 || isAnswering) return;
     const last = answers.pop();
     scores[last.typeId] -= last.value;
+    lastPoppedValue = last.value;
     currentQ--;
     showScreen('question');
     renderQuestion();
