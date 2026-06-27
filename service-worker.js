@@ -1,4 +1,4 @@
-const CACHE_NAME = 'adhd-rest-quiz-v2';
+const CACHE_NAME = 'adhd-rest-quiz-v3';
 const BASE = new URL('./', self.location).href;
 const PRECACHE = [
   BASE,
