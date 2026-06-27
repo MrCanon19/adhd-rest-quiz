@@ -798,7 +798,7 @@
   // Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/adhd-rest-quiz/service-worker.js');
+      navigator.serviceWorker.register('./service-worker.js');
     });
   }
 

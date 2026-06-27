@@ -1,14 +1,14 @@
-const CACHE_NAME = 'adhd-rest-quiz-v1';
+const CACHE_NAME = 'adhd-rest-quiz-v2';
+const BASE = new URL('./', self.location).href;
 const PRECACHE = [
-  '/adhd-rest-quiz/',
-  '/adhd-rest-quiz/index.html',
-  '/adhd-rest-quiz/manifest.json',
-  '/adhd-rest-quiz/favicon.svg',
-  '/adhd-rest-quiz/apple-touch-icon.png',
-  '/adhd-rest-quiz/icons/icon-192.png',
-  '/adhd-rest-quiz/icons/icon-512.png',
-  '/adhd-rest-quiz/icons/icon-maskable-192.png',
-  '/adhd-rest-quiz/icons/icon-maskable-512.png',
+  BASE,
+  BASE + 'manifest.json',
+  BASE + 'favicon.svg',
+  BASE + 'apple-touch-icon.png',
+  BASE + 'icons/icon-192.png',
+  BASE + 'icons/icon-512.png',
+  BASE + 'icons/icon-maskable-192.png',
+  BASE + 'icons/icon-maskable-512.png',
 ];
 
 self.addEventListener('install', event => {
