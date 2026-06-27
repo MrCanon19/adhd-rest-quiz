@@ -1,0 +1,39 @@
+{
+  "name": "Jakiego odpoczynku potrzebujesz?",
+  "short_name": "Quiz odpoczynku",
+  "description": "14 pytań, 7 typów odpoczynku. Znajdź czego potrzebuje Twój układ nerwowy — bez rejestracji.",
+  "start_url": "/adhd-rest-quiz/",
+  "scope": "/adhd-rest-quiz/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#2a9d8f",
+  "background_color": "#f0f7f7",
+  "lang": "pl",
+  "categories": ["health", "lifestyle"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
